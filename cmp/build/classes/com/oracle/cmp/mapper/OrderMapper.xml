@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.cmp.dao.IOrderDao">
+	<resultMap type="Order" id="orderMap">
+		<id column="orderId" property="orderId"></id>
+		<result column="orderCode" property="orderCode"/>
+		<result column="orderDate" property="orderDate"/>
+		<result column="orderFlag" property="orderFlag"/>
+		<!-- <collection property="orderDetails" ofType="OrderDetail"
+		resultMap="com.oracle.cmp.dao.IOrderDetailDao.orderDetailMap"></collection> -->
+	</resultMap>
+	<select id="select" resultMap="orderMap">
+		select * from biz_order o left outer join biz_orderdetail d
+		on o.orderid = d.orderid
+	</select>
+	<select id="selectOrder" resultMap="orderMap" parameterType="java.util.Map">
+		select * from biz_order
+		<where>
+			<if test="orderCode != null and orderCode != ''">
+				orderCode=#{orderCode}
+			</if>
+			<if test="orderDate != null and orderDate != ''">
+				orderDate=#{orderDate}
+			</if>
+			<if test="orderFlag != null and orderFlag != ''">
+				orderFlag=#{orderFlag}
+			</if>
+		</where>
+	</select>
+	<insert id="insert" parameterType="Order" useGeneratedKeys="true" keyProperty="orderId">
+		insert into biz_order (orderId,orderCode,orderDate,orderFlag) 
+		values (default,#{orderCode},#{orderDate},#{orderFlag})
+	</insert>
+	<update id="update" parameterType="Order">
+		update biz_order 
+		<set>
+			<if test="orderCode != null and orderCode != ''">
+				orderCode=#{orderCode},
+			</if>
+			<if test="orderDate != null and orderDate != ''">
+				orderDate=#{orderDate},
+			</if>
+			<if test="orderFlag != null and orderFlag != ''">
+				orderFlag=#{orderFlag},
+			</if>
+		</set>
+		<where>
+			orderId=#{orderId}
+		</where>
+	</update>
+</mapper>

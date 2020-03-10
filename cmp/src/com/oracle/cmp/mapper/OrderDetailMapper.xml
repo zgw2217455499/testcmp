@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.cmp.dao.IOrderDetailDao">
+	<resultMap type="OrderDetail" id="orderDetailMap">
+		<id column="orderDetailId" property="orderDetailId"></id>
+		<result column="orderPartsCount" property="orderPartsCount"/>
+		<association property="order" javaType="Order" resultMap="com.oracle.cmp.dao.IOrderDao.orderMap"></association>
+		<association property="partsId" javaType="Parts" resultMap="com.oracle.cmp.dao.IPartsDao.partsMap"></association>
+	</resultMap>
+	 <select id="select" resultMap="orderDetailMap" parameterType="java.util.Map">
+		select orderDetailId,orderPartsCount,od.partsId,partsName,od.orderId,orderCode,orderDate,orderFlag from biz_orderdetail od left outer join biz_parts bp
+		on od.partsId = bp.partsId
+		left outer join biz_order bo
+		on od.orderId = bo.orderId
+		<where>
+			<if test="orderCode != null and orderCode != ''">
+				orderCode = #{orderCode}
+			</if>
+			<if test="orderDate != null and orderDate != ''">
+				<bind name="orderDate" value="orderDate+'%'"/>
+				orderDate = #{orderDate}
+			</if>
+			<if test="orderFlag != null and orderFlag != ''">
+				orderFlag = #{orderFlag}
+			</if>
+		</where>
+	</select>	
+	<insert id="insert" parameterType="OrderDetail">
+		insert into biz_orderdetail (orderDetailId,orderPartsCount,partsId,orderId) 
+		values (default,#{orderPartsCount},#{partsId.partsId},#{order.orderId})
+	</insert> 
+</mapper>

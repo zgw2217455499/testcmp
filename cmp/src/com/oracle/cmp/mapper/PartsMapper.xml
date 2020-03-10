@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.cmp.dao.IPartsDao">
+	<resultMap type="Parts" id="partsMap">
+		<id column="partsId" property="partsId"></id>
+		<result column="partsName" property="partsName"/>
+		<result column="partsModel" property="partsModel"/>
+		<result column="partsLoc" property="partsLoc"/>
+		<result column="partsProDate" property="partsProDate"/>
+		<result column="partsRemark" property="partsRemark"/>
+	</resultMap>
+	<sql id="sql">partsId,partsModel,partsLoc,partsProDate,partsRemark,partsName</sql>
+	<select id="select" resultMap="partsMap" parameterType="java.util.Map">
+		select * from biz_parts 
+		<where>
+			<if test="partsName != null and partsName !=''">
+				partsName=#{partsName}
+			</if>
+		</where>
+	</select>
+	<select id="selectById" parameterType="int" resultMap="partsMap">
+		select * from biz_parts where partsId=#{partsId}
+	</select>
+	<select id="selectByName" parameterType="java.util.Map" resultMap="partsMap">
+		select <include refid="sql"></include>,partsName from biz_parts where partsName=#{partsName}
+	</select>
+	<insert id="insert" parameterType="Parts">
+		insert into biz_parts (<include refid="sql"></include> )
+		values (default ,#{partsModel},#{partsLoc},#{partsProDate},#{partsRemark},#{partsName})
+	</insert>
+	<update id="update" parameterType="Parts">
+		update biz_parts
+		<set>
+			<if test="partsModel!=null and partsModel!=''">
+				partsModel = #{partsModel},
+			</if>
+			<if test="partsLoc!=null and partsLoc!=''">
+				partsLoc = #{partsLoc},
+			</if>
+			<if test="partsProDate!=null and partsProDate!=''">
+				partsProDate = #{partsProDate},
+			</if>
+			<if test="partsRemark!=null and partsRemark!=''">
+				partsRemark = #{partsRemark},
+			</if>
+			<if test="partsName!=null and partsName!=''">
+				partsName = #{partsName},
+			</if>
+		</set>
+		<where>
+			partsId = #{partsId}
+		</where>
+	</update>
+	<delete id="delete" parameterType="int">
+		delete from biz_parts where partsId = #{partsId}
+	</delete>
+</mapper>

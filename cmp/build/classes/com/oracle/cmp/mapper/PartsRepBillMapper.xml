@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.cmp.dao.IPartsRepBillDao">
+	<resultMap type="PartsRepBill" id="partsRepBillMap">
+		<id column="billId" property="billId"></id>
+		<result column="billCount" property="billCount"/>
+		<result column="billTime" property="billTime"/>
+		<association property="billFlag" javaType="Code">
+			<id column="billFlag" property="code"/>
+			<result column="name" property="name"/>
+		</association>
+		<association property="billType" javaType="Code">
+			<id column="billType" property="code"/>		
+			<result column="tname" property="name"/>
+		</association>
+		<association property="partsId" javaType="Parts">
+			<id column="partsId" property="partsId"/>
+			<result column="partsName" property="partsName"/>
+		</association>
+		<association property="billUser" javaType="Emp">
+			<id column="id" property="id"/>
+			<result column="ename" property="name"/>
+		</association>
+		
+	</resultMap>
+	<select id="select" resultMap="partsRepBillMap" parameterType="java.util.Map">
+		select billId,billCount,billTime,billFlag,billType,p.partsId,partsName,c.name,t.name tname,billUser,e.name ename from biz_partsrepbill pb 
+		left outer join sys_code c on billFlag = c.code
+		left outer join biz_parts p on p.partsId = pb.partsId
+		left outer join sys_emp e on billUser = e.id
+		left outer join sys_code t on billType = t.code
+		<where>
+			<if test="partsName !=null and partsName != ''">
+				and partsName = #{partsName}
+			</if>
+			<if test="billType !=null and billType != ''">
+				and billType = #{billType}
+			</if>
+			<if test="billTime !=null and billTime != ''">
+				<bind name="billTime" value="billTime + '%'"/>
+				and billTime like #{billTime}
+			</if>
+			<if test="billFlag !=null and billFlag != ''">
+				and billFlag = #{billFlag}
+			</if>
+		</where>
+	</select>
+	<select id="selectByBillType" resultMap="partsRepBillMap" parameterType="java.util.Map">
+		select billId,billCount,billTime,billFlag,billType,p.partsId,partsName,c.name,t.name tname,billUser,e.name ename from biz_partsrepbill pb 
+		left outer join sys_code c on billFlag = c.code
+		left outer join biz_parts p on p.partsId = pb.partsId
+		left outer join sys_emp e on billUser = e.id
+		left outer join sys_code t on billType = t.code
+		<where>
+			<if test="partsName !=null and partsName != ''">
+				and partsName = #{partsName}
+			</if>
+			<if test="billType !=null and billType != ''">
+				and billType = #{billType}
+			</if>
+			<if test="billTime !=null and billTime != ''">
+				<bind name="billTime" value="billTime + '%'"/>
+				and billTime like #{billTime}
+			</if>
+			<if test="billFlag !=null and billFlag != ''">
+				and billFlag = #{billFlag}
+			</if>
+		</where>
+	</select>
+	<insert id="insert" parameterType="PartsRepBill">
+		insert into biz_partsrepbill (billId,billFlag,billType,partsId,billCount,billTime,billUser) 
+		values (default,#{billFlag.code},#{billType.type},#{partsId.partsId},#{billCount},#{billTime},#{billUser.id})
+	</insert>
+	
+</mapper> 

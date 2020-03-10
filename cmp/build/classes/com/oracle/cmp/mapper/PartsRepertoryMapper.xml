@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracle.cmp.dao.IPartsRepertoryDao">
+	<resultMap type="PartsRepertory" id="partsRepertoryMap">
+		<id column="partsRepId" property="partsRepId"></id>
+		<result column="partsRepCount" property="partsRepCount"/>
+		<association property="partsId" javaType="Parts">
+			<result column="ppartsId" property="partsId"/>	
+			<result column="partsName" property="partsName"/>
+		</association>
+	</resultMap>
+	
+	<select id="select" resultMap="partsRepertoryMap" parameterType="java.util.Map">
+		select partsRepId,partsRepCount,pr.partsId ppartsId,partsName from biz_partsrepertory pr
+		left outer join biz_parts p
+		on pr.partsId = p.partsid
+		<where>
+			<if test="partsId != null and partsId != ''">
+				pr.partsId = #{partsId}
+			</if>
+			<if test="partsName != null and partsName != ''">
+				partsName = #{partsName}
+			</if>
+		</where>
+	</select>
+	<update id="update" parameterType="PartsRepertory">
+		update biz_partsrepertory
+		<set>
+			<if test="partsRepId != null and partsRepId != ''">
+				partsRepId = #{partsRepId},
+			</if>
+			<if test="partsRepCount != null and partsRepCount != ''">
+				partsRepCount = #{partsRepCount},
+			</if>
+		</set>
+		 where	partsId=#{partsId.partsId}
+	</update>
+	<insert id="insert" parameterType="PartsRepertory">
+		insert into biz_partsrepertory (partsRepId,partsRepCount,partsId)
+		 values(default,#{partsRepCount},#{partsId.partsId})
+	</insert>
+	<!-- <select id="selectNoRegist" resultMap="empMap">
+		select * from sys_emp e where 
+			not exists (select 'a' from sys_user u where e.id = u.eid)
+	</select> -->
+</mapper>
